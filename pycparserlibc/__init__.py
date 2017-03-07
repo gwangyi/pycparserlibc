@@ -11,15 +11,17 @@ def preprocess(text, filename='', cpp_args='', preprocessor=None, fake_defs=Fals
     else:
         p = preprocessor
 
+    if fake_defs:
+        for define in fake.defines:
+            p.define(define)
+
+    fake_macros = list(p.macros.keys())
+
     for cpp_arg in cpp_args:
         if cpp_arg[:2] == '-I':
             p.add_path(cpp_arg[2:])
         elif cpp_arg[:2] == '-D':
             p.define(cpp_arg[2:].replace('=', ' ', 1))
-
-    if fake_defs:
-        for define in fake.defines:
-            p.define(define)
 
     p.parse(text, filename)
 
@@ -34,7 +36,11 @@ def preprocess(text, filename='', cpp_args='', preprocessor=None, fake_defs=Fals
                 latest = p.source
             yield tok.value
 
-    return ''.join(gen())
+    processed = ''.join(gen())
+    for m in fake_macros:
+        del p.macros[m]
+
+    return processed
 
 
 def parse(text, filename='', parser=None, fake_typedefs=False):
