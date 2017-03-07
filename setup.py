@@ -9,7 +9,6 @@ setup(
     maintainer='Sungkwang Lee',
     author_email='gwangyi.kr@gmail.com',
     url='https://github.com/gwangyi/pycparserlibc',
-    platform='Cross Platform',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3',],
