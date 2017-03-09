@@ -12,6 +12,6 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3',],
-    install_requires=['pycparser>=2.17'],
+    install_requires=['ply', 'pycparser>=2.17'],
     packages=['pycparserlibc'],
 )

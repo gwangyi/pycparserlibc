@@ -1,7 +1,4 @@
-try:
-    from pycparser.ply import cpp, lex
-except ImportError:
-    from ply import cpp, lex
+from ply import cpp, lex
 
 from . import fake
 import os
