@@ -9,6 +9,20 @@ class Preprocessor(cpp.Preprocessor):
         if lexer is None:
             lexer = lex.lex(module=cpp)
         super().__init__(lexer)
+        self._prev_source = None
+
+
+    def parsegen(self, input, source=None):
+        for tok in super().parsegen(input, source):
+            if self._prev_source != self.source:
+                self._prev_source = self.source
+                if self.source:
+                    line_dir = f'# {tok.lineno} "{self.source}"\n'
+                else:
+                    line_dir = f'# {tok.lineno}\n'
+                for t in self.tokenize(line_dir):
+                    yield t
+            yield tok
 
     # ----------------------------------------------------------------------
     # include()
@@ -47,12 +61,13 @@ class Preprocessor(cpp.Preprocessor):
         for p in path:
             iname = os.path.join(p,filename)
             try:
-                data = open(iname,"r").read()
+                data = open(iname,"r").read().rstrip("\n") + "\n\n"
                 dname = os.path.dirname(iname)
                 if dname:
                     self.temp_path.insert(0,dname)
-                for tok in self.parsegen(data,filename):
+                for tok in self.parsegen(data,iname):
                     yield tok
+
                 if dname:
                     del self.temp_path[0]
                 break

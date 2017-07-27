@@ -23,20 +23,7 @@ def preprocess(text, filename='', cpp_args='', preprocessor=None, fake_defs=Fals
         elif cpp_arg[:2] == '-D':
             p.define(cpp_arg[2:].replace('=', ' ', 1))
 
-    p.parse(text, filename)
-
-    def gen():
-        latest = ''
-        while True:
-            tok = p.token()
-            if not tok:
-                return
-            if latest != p.source:
-                yield '# {} "{}"\n'.format(tok.lineno - 1, p.source)
-                latest = p.source
-            yield tok.value
-
-    processed = ''.join(gen())
+    processed = ''.join(token.value for token in p.parsegen(text, filename))
     for m in fake_macros:
         del p.macros[m]
 
@@ -49,7 +36,7 @@ def parse(text, filename='', parser=None, fake_typedefs=False):
 
     if fake_typedefs:
         text = ''.join((fake.typedefs,
-                        '# {} "{}"\n'.format(0, filename),
+                        f'# 1 "{filename}"\n',
                         text))
 
     ast = parser.parse(text, filename)
